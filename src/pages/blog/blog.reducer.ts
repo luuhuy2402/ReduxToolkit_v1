@@ -13,6 +13,11 @@ const initalState: BlogState = {
 export const addPost = createAction<Post>("blog/addPost");
 
 // Hàm builder callback dùng để xử lý action và cập nhật state
-const blogReducer = createReducer(initalState, (builder) => {});
+const blogReducer = createReducer(initalState, (builder) => {
+    builder.addCase(addPost, (state, action) => {
+        const post = action.payload;
+        state.postList.push(post);
+    });
+});
 
 export default blogReducer;
