@@ -18,6 +18,7 @@ export default function CreatePost() {
         event.preventDefault();
         const formDataWithId = { ...formData, id: new Date().toISOString() };
         dispatch(addPost(formDataWithId));
+        setFormData(initialState);
     };
     return (
         <form onSubmit={handleSubmit}>

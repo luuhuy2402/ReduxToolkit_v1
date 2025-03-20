@@ -1,10 +1,16 @@
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import PostItem from "../PostItem";
 import { RootState } from "../../../../store";
+import { deletePost } from "../../blog.reducer";
 
 export default function PostList() {
     // useSelector là một hook của react-redux, được sử dụng để lấy dữ liệu từ Redux store trong một functional component của React.
+    //lấy dữ liệu để hiển thị lên UI
     const postList = useSelector((state: RootState) => state.blog.postList);
+    const dispatch = useDispatch();
+    const handleDelete = (postId: string) => {
+        dispatch(deletePost(postId));
+    };
     return (
         <div className="bg-white py-6 sm:py-8 lg:py-12">
             <div className="mx-auto max-w-screen-xl px-4 md:px-8">
@@ -19,7 +25,11 @@ export default function PostList() {
                 </div>
                 <div className="grid gap-4 sm:grid-cols-2 md:gap-6 lg:grid-cols-2 xl:grid-cols-2 xl:gap-8">
                     {postList.map((post) => (
-                        <PostItem post={post} key={post.id} />
+                        <PostItem
+                            post={post}
+                            key={post.id}
+                            handleDelete={handleDelete}
+                        />
                     ))}
                 </div>
             </div>
