@@ -1,7 +1,11 @@
 import { useEffect, useState } from "react";
 import { Post } from "../../../../types/blog.type";
 import { useDispatch, useSelector } from "react-redux";
-import { addPost } from "../../blog.reducer";
+import {
+    addPost,
+    cancelEditingPost,
+    finishEditingPost,
+} from "../../blog.reducer";
 import { RootState } from "../../../../store";
 
 const initialState: Post = {
@@ -15,13 +19,6 @@ const initialState: Post = {
 export default function CreatePost() {
     const [formData, setFormData] = useState<Post>(initialState);
     const dispatch = useDispatch();
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
-        const formDataWithId = { ...formData, id: new Date().toISOString() };
-        dispatch(addPost(formDataWithId));
-        setFormData(initialState);
-    };
-
     //Edit post
     //Lấy dữ liệu
     const editingPost = useSelector(
@@ -31,8 +28,28 @@ export default function CreatePost() {
         setFormData(editingPost || initialState);
     }, [editingPost]);
 
+    //Cancel editing post
+    const handleCancelEditingPost = () => {
+        dispatch(cancelEditingPost());
+    };
+
+    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        if (editingPost) {
+            dispatch(finishEditingPost(formData));
+        } else {
+            const formDataWithId = {
+                ...formData,
+                id: new Date().toISOString(),
+            };
+            dispatch(addPost(formDataWithId));
+        }
+
+        setFormData(initialState);
+    };
+
     return (
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} onReset={handleCancelEditingPost}>
             <div className="mb-6">
                 <label
                     htmlFor="title"
@@ -144,30 +161,37 @@ export default function CreatePost() {
                 </label>
             </div>
             <div>
-                <button
-                    className="group relative inline-flex items-center justify-center overflow-hidden rounded-lg bg-gradient-to-br from-purple-600 to-blue-500 p-0.5 text-sm font-medium text-gray-900 hover:text-white focus:outline-none focus:ring-4 focus:ring-blue-300 group-hover:from-purple-600 group-hover:to-blue-500 dark:text-white dark:focus:ring-blue-800"
-                    type="submit"
-                >
-                    <span className="relative rounded-md bg-white px-5 py-2.5 transition-all duration-75 ease-in group-hover:bg-opacity-0 dark:bg-gray-900">
-                        Publish Post
-                    </span>
-                </button>
-                {/* <button
-                    type="submit"
-                    className="group relative mb-2 mr-2 inline-flex items-center justify-center overflow-hidden rounded-lg bg-gradient-to-br from-teal-300 to-lime-300 p-0.5 text-sm font-medium text-gray-900 focus:outline-none focus:ring-4 focus:ring-lime-200 group-hover:from-teal-300 group-hover:to-lime-300 dark:text-white dark:hover:text-gray-900 dark:focus:ring-lime-800"
-                >
-                    <span className="relative rounded-md bg-white px-5 py-2.5 transition-all duration-75 ease-in group-hover:bg-opacity-0 dark:bg-gray-900">
-                        Update Post
-                    </span>
-                </button>
-                <button
-                    type="reset"
-                    className="group relative mb-2 mr-2 inline-flex items-center justify-center overflow-hidden rounded-lg bg-gradient-to-br from-red-200 via-red-300 to-yellow-200 p-0.5 text-sm font-medium text-gray-900 focus:outline-none focus:ring-4 focus:ring-red-100 group-hover:from-red-200 group-hover:via-red-300 group-hover:to-yellow-200 dark:text-white dark:hover:text-gray-900 dark:focus:ring-red-400"
-                >
-                    <span className="relative rounded-md bg-white px-5 py-2.5 transition-all duration-75 ease-in group-hover:bg-opacity-0 dark:bg-gray-900">
-                        Cancel
-                    </span>
-                </button> */}
+                {!editingPost && (
+                    <button
+                        className="group relative inline-flex items-center justify-center overflow-hidden rounded-lg bg-gradient-to-br from-purple-600 to-blue-500 p-0.5 text-sm font-medium text-gray-900 hover:text-white focus:outline-none focus:ring-4 focus:ring-blue-300 group-hover:from-purple-600 group-hover:to-blue-500 dark:text-white dark:focus:ring-blue-800"
+                        type="submit"
+                    >
+                        <span className="relative rounded-md bg-white px-5 py-2.5 transition-all duration-75 ease-in group-hover:bg-opacity-0 dark:bg-gray-900">
+                            Publish Post
+                        </span>
+                    </button>
+                )}
+
+                {editingPost && (
+                    <>
+                        <button
+                            type="submit"
+                            className="group relative mb-2 mr-2 inline-flex items-center justify-center overflow-hidden rounded-lg bg-gradient-to-br from-teal-300 to-lime-300 p-0.5 text-sm font-medium text-gray-900 focus:outline-none focus:ring-4 focus:ring-lime-200 group-hover:from-teal-300 group-hover:to-lime-300 dark:text-white dark:hover:text-gray-900 dark:focus:ring-lime-800"
+                        >
+                            <span className="relative rounded-md bg-white px-5 py-2.5 transition-all duration-75 ease-in group-hover:bg-opacity-0 dark:bg-gray-900">
+                                Update Post
+                            </span>
+                        </button>
+                        <button
+                            type="reset"
+                            className="group relative mb-2 mr-2 inline-flex items-center justify-center overflow-hidden rounded-lg bg-gradient-to-br from-red-200 via-red-300 to-yellow-200 p-0.5 text-sm font-medium text-gray-900 focus:outline-none focus:ring-4 focus:ring-red-100 group-hover:from-red-200 group-hover:via-red-300 group-hover:to-yellow-200 dark:text-white dark:hover:text-gray-900 dark:focus:ring-red-400"
+                        >
+                            <span className="relative rounded-md bg-white px-5 py-2.5 transition-all duration-75 ease-in group-hover:bg-opacity-0 dark:bg-gray-900">
+                                Cancel
+                            </span>
+                        </button>
+                    </>
+                )}
             </div>
         </form>
     );

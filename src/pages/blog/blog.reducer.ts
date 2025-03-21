@@ -2,6 +2,7 @@ import { createAction, createReducer } from "@reduxjs/toolkit";
 import { Post } from "../../types/blog.type";
 import { initalPostList } from "../../constants/blog";
 
+
 interface BlogState {
     postList: Post[];
     editingPost: Post | null;
@@ -15,6 +16,8 @@ const initalState: BlogState = {
 export const addPost = createAction<Post>("blog/addPost");
 export const deletePost = createAction<string>("blog/deletePost");
 export const startEditingPost = createAction<string>("blog/startEditingPost");
+export const cancelEditingPost = createAction("blog/cancelEditingPost");
+export const finishEditingPost = createAction<Post>("blog/finishEditingPost");
 // Hàm builder callback dùng để xử lý action và cập nhật state
 const blogReducer = createReducer(initalState, (builder) => {
     builder
@@ -37,6 +40,20 @@ const blogReducer = createReducer(initalState, (builder) => {
                 state.postList.find((post) => post.id === postId) || null;
 
             state.editingPost = foundPost;
+        })
+        .addCase(cancelEditingPost, (state) => {
+            state.editingPost = null;
+        })
+        .addCase(finishEditingPost, (state, action) => {
+            const postId = action.payload.id;
+            state.postList.some((post, index) => {
+                if (post.id === postId) {
+                    state.postList[index] = action.payload;
+                    return true; //Dừng lại ngay nếu đã cập nhật
+                }
+                return false;
+            });
+            state.editingPost = null;
         });
 });
 
