@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Post } from "../../../../types/blog.type";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { addPost } from "../../blog.reducer";
+import { RootState } from "../../../../store";
 
 const initialState: Post = {
     id: "",
@@ -20,6 +21,16 @@ export default function CreatePost() {
         dispatch(addPost(formDataWithId));
         setFormData(initialState);
     };
+
+    //Edit post
+    //Lấy dữ liệu
+    const editingPost = useSelector(
+        (state: RootState) => state.blog.editingPost
+    );
+    useEffect(() => {
+        setFormData(editingPost || initialState);
+    }, [editingPost]);
+
     return (
         <form onSubmit={handleSubmit}>
             <div className="mb-6">

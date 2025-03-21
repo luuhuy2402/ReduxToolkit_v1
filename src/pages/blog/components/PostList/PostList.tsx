@@ -1,7 +1,7 @@
 import { useDispatch, useSelector } from "react-redux";
 import PostItem from "../PostItem";
 import { RootState } from "../../../../store";
-import { deletePost } from "../../blog.reducer";
+import { deletePost, startEditingPost } from "../../blog.reducer";
 
 export default function PostList() {
     // useSelector là một hook của react-redux, được sử dụng để lấy dữ liệu từ Redux store trong một functional component của React.
@@ -10,6 +10,10 @@ export default function PostList() {
     const dispatch = useDispatch();
     const handleDelete = (postId: string) => {
         dispatch(deletePost(postId));
+    };
+
+    const handleStartEditing = (postId: string) => {
+        dispatch(startEditingPost(postId));
     };
     return (
         <div className="bg-white py-6 sm:py-8 lg:py-12">
@@ -29,6 +33,7 @@ export default function PostList() {
                             post={post}
                             key={post.id}
                             handleDelete={handleDelete}
+                            handleStartEditing={handleStartEditing}
                         />
                     ))}
                 </div>
