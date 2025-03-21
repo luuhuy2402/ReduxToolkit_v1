@@ -1,7 +1,6 @@
-import { createAction, createReducer } from "@reduxjs/toolkit";
+import { createAction, createReducer, current, nanoid } from "@reduxjs/toolkit";
 import { Post } from "../../types/blog.type";
 import { initalPostList } from "../../constants/blog";
-
 
 interface BlogState {
     postList: Post[];
@@ -13,7 +12,21 @@ const initalState: BlogState = {
     editingPost: null,
 };
 
-export const addPost = createAction<Post>("blog/addPost");
+export const addPost = createAction(
+    "blog/addPost",
+    //Prepare callback để tinh chỉnh payload
+    /**Mặc định bạn truyền vào gì thì payload sẽ là cái đó,
+     * trong trường hợp bạn muốn truyền vào x nhưng payload là x + 2 thì
+     * bạn có thể dùng prepare function callback */
+    function (post: Omit<Post, "id">) {
+        return {
+            payload: {
+                ...post,
+                id: nanoid(),
+            },
+        };
+    }
+);
 export const deletePost = createAction<string>("blog/deletePost");
 export const startEditingPost = createAction<string>("blog/startEditingPost");
 export const cancelEditingPost = createAction("blog/cancelEditingPost");
@@ -54,6 +67,17 @@ const blogReducer = createReducer(initalState, (builder) => {
                 return false;
             });
             state.editingPost = null;
+        })
+        .addMatcher(
+            (action) => action.type.includes("cancel"), //nếu trả về true thì hàm sau sẽ chạy
+            (state) => {
+                console.log(current(state));
+            }
+        )
+        // nếu muốn thêm default case khi không match case nào cả
+        // thì dùng addDefaultCase
+        .addDefaultCase((state) => {
+            console.log(state);
         });
 });
 

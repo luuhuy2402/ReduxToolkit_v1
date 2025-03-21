@@ -40,7 +40,6 @@ export default function CreatePost() {
         } else {
             const formDataWithId = {
                 ...formData,
-                id: new Date().toISOString(),
             };
             dispatch(addPost(formDataWithId));
         }
